@@ -13,7 +13,7 @@ type MySqlConfig struct {
 	Name     string
 }
 
-func GetMySqlConnedtion(cfg *MySqlConfig) (*sql.DB, error) {
+func GetMySqlConnection(cfg *MySqlConfig) (*sql.DB, error) {
 	dsn := fmt.Sprintf("%s:%s@/%s?parseTime=true", cfg.User, cfg.Password, cfg.Name)
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {

@@ -26,7 +26,7 @@ func NewUser(email, password string) (*User, error) {
 
 var (
 	emailRegex    = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
-	passwordRegex = `^[a-zA-Z\d]*[a-z][a-zA-Z\d]*[A-Z][a-zA-Z\d]*\d[a-zA-Z\d]*$`
+	passwordRegex = `^[a-zA-Z\d]*[a-z][a-zA-Z\d]*[A-Z][a-zA-Z\d]*[a-zA-Z\d]*$`
 )
 
 func (u *User) IsValid() error {

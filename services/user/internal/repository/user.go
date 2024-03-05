@@ -9,6 +9,12 @@ type UserRepositoryImpl struct {
 	DB *sql.DB
 }
 
+func NewUserRepository(db *sql.DB) *UserRepositoryImpl {
+	return &UserRepositoryImpl{
+		DB: db,
+	}
+}
+
 func (r *UserRepositoryImpl) Insert(userToInsert domain.User) (int, error) {
 	var id int
 	stmt := "INSERT INTO users(email, password, created_at) VALUES(?, ?, ?);SELECT LAST_INSERTED_ID();"
@@ -38,7 +44,13 @@ func (r *UserRepositoryImpl) GetAll() ([]domain.User, error) {
 }
 
 func (r *UserRepositoryImpl) Get(id int) (domain.User, error) {
-	return domain.User{}, nil
+	var user domain.User
+	stmt := "SELECT * FROM users WHERE id=?"
+	err := r.DB.QueryRow(stmt, id).Scan(&user.ID, &user.Email, &user.Password, &user.CreatedAt)
+	if err != nil {
+		return domain.User{}, err
+	}
+	return user, nil
 }
 
 func (r *UserRepositoryImpl) Delete(id int) error {
