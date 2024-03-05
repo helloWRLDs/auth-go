@@ -7,5 +7,7 @@ type UserRepository interface {
 	GetAll() ([]domain.User, error)
 	Get(id int) (domain.User, error)
 	Delete(id int) error
-	Authenticate(email, password string) (int, error) 
+	Authenticate(email, password string) (int, error)
+	ExistsByEmail(email string) bool
+	Exists(id int) bool
 }

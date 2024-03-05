@@ -24,15 +24,25 @@ func (u *UserUseCaseImpl) RegisterUser(ctx *gin.Context) {
 		ctx.JSON(422, err.Error())
 		return
 	}
-	email := ctx.Request.PostFormValue("email")
+	// receiving data from post request
+	email := ctx.PostForm("email")
 	password := ctx.PostForm("password")
-	fmt.Println(email, password)
-
+	// validating and creating user's instance
 	user, err := domain.NewUser(email, password)
 	if err != nil {
 		ctx.JSON(422, err.Error())
 		return
 	}
-
-	ctx.JSON(200, user)
+	// check for uniqueness of email
+	if u.repo.ExistsByEmail(user.Email) {
+		ctx.JSON(409, "user with such email already exists")
+		return
+	}
+	// inserting new User to database
+	id, err := u.repo.Insert(*user)
+	if err != nil {
+		ctx.JSON(500, err.Error())
+		return
+	}
+	ctx.JSON(200, fmt.Sprintf("user registered with id=%d", id))
 }

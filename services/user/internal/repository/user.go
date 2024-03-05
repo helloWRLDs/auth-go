@@ -17,9 +17,12 @@ func NewUserRepository(db *sql.DB) *UserRepositoryImpl {
 
 func (r *UserRepositoryImpl) Insert(userToInsert domain.User) (int, error) {
 	var id int
-	stmt := "INSERT INTO users(email, password, created_at) VALUES(?, ?, ?);SELECT LAST_INSERTED_ID();"
-	err := r.DB.QueryRow(stmt, userToInsert.Email, userToInsert.Password, userToInsert.CreatedAt).Scan(&id)
+	stmt := "INSERT INTO users(email, password, created_at) VALUES(?, ?, ?);"
+	_, err := r.DB.Exec(stmt, userToInsert.Email, userToInsert.Password, userToInsert.CreatedAt)
 	if err != nil {
+		return -1, err
+	}
+	if err := r.DB.QueryRow("SELECT LAST_INSERT_ID();").Scan(&id); err != nil {
 		return -1, err
 	}
 	return id, nil
@@ -66,4 +69,22 @@ func (r *UserRepositoryImpl) Authenticate(email, password string) (int, error) {
 	}
 
 	return id, nil
+}
+
+func (r *UserRepositoryImpl) ExistsByEmail(email string) bool {
+	var exists bool
+	stmt := "SELECT EXISTS(SELECT TRUE FROM users WHERE email=?)"
+	if err := r.DB.QueryRow(stmt, email).Scan(&exists); err != nil {
+		return false
+	}
+	return exists
+}
+
+func (r *UserRepositoryImpl) Exists(id int) bool {
+	var exists bool
+	stmt := "SELECT EXISTS(SELECT TRUE FROM users WHERE id=?)"
+	if err := r.DB.QueryRow(stmt, id).Scan(&exists); err != nil {
+		return false
+	}
+	return exists
 }
