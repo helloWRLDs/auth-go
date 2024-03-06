@@ -37,12 +37,38 @@ var (
 	passwordRegex = `[a-zA-Z0-9]{3,}`
 )
 
+func (u *User) SetPassword(password []byte) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword(password, 12)
+	if err != nil {
+		return err
+	}
+	u.Password = hashedPassword
+	return nil
+}
+
 func (u *User) IsValid() error {
-	if len(u.Email) == 0 || len(u.Password) == 0 {
+	if err := u.ValidateEmail(); err != nil {
+		return err
+	}
+	if err := u.ValidatePassword(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *User) ValidateEmail() error {
+	if len(u.Email) == 0 {
 		return ErrEmptyField
 	}
 	if !regexp.MustCompile(emailRegex).MatchString(u.Email) {
 		return ErrEmailValidation
+	}
+	return nil
+}
+
+func (u *User) ValidatePassword() error {
+	if len(u.Password) == 0 {
+		return ErrEmptyField
 	}
 	if !regexp.MustCompile(passwordRegex).MatchString(string(u.Password)) {
 		return ErrPasswordValidation

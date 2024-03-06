@@ -57,13 +57,19 @@ func (r *UserRepositoryImpl) Get(id int) (domain.User, error) {
 	}
 	return user, nil
 }
+
 func (r *UserRepositoryImpl) Update(id int, userToUpdate domain.User) error {
-	stmt := "UPDATE users SET email=?, password=?, created_at=? WHERE id=?"
-	_, err := r.DB.Exec(stmt, userToUpdate.Email, userToUpdate.Password, userToUpdate.CreatedAt, id)
+	stmt := "UPDATE users SET email=?, password=? WHERE id=?"
+	_, err := r.DB.Exec(stmt, userToUpdate.Email, userToUpdate.Password, id)
 	return err
 }
 
 func (r *UserRepositoryImpl) Delete(id int) error {
+	stmt := "DELETE FROM users WHERE id=?"
+	_, err := r.DB.Exec(stmt, id)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

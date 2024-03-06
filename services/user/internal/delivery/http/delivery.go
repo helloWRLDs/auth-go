@@ -29,9 +29,9 @@ func (d *HttpDelivery) InitRoutes() {
 	})
 	d.Router.POST("/signup", d.UserUC.RegisterUser)
 	d.Router.POST("/login", d.UserUC.LoginUser)
-	userGroup := d.Router.Group("/users")
+	userGroup := d.Router.Group("/users", Authenticate())
 	{
-		// userGroup.GET("/", d.UserUC.GetUsers)
+		userGroup.GET("/", d.UserUC.GetUsers)
 		userGroup.GET("/:id", d.UserUC.GetUser)
 		userGroup.PUT("/:id", d.UserUC.UpdateUser)
 		userGroup.DELETE("/:id", d.UserUC.RemoveUser)
