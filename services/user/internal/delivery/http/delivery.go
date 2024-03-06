@@ -29,12 +29,11 @@ func (d *HttpDelivery) InitRoutes() {
 	})
 	d.Router.POST("/signup", d.UserUC.RegisterUser)
 	d.Router.POST("/login", d.UserUC.LoginUser)
-	d.Router.Group("/user")
-	//	{
-	//		d.Router.GET("/", d.UserUC.GetUsers)
-	//		d.Router.GET("/:id", d.UserUC.GetUser)
-	//		d.Router.PUT("/:id", d.UserUC.UpdateUser)
-	//		d.Router.DELETE("/:id", d.UserUC.RemoveUser)
-	//	}
-	//}
+	userGroup := d.Router.Group("/users")
+	{
+		// userGroup.GET("/", d.UserUC.GetUsers)
+		userGroup.GET("/:id", d.UserUC.GetUser)
+		userGroup.PUT("/:id", d.UserUC.UpdateUser)
+		userGroup.DELETE("/:id", d.UserUC.RemoveUser)
+	}
 }

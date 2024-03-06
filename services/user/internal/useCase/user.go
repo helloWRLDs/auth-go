@@ -6,8 +6,9 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/gin-gonic/gin"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type UserUseCaseImpl struct {
@@ -76,9 +77,10 @@ func (u *UserUseCaseImpl) LoginUser(ctx *gin.Context) {
 
 	ctx.JSON(200, gin.H{"token": token})
 }
+
 func (u *UserUseCaseImpl) GetUser(ctx *gin.Context) {
 	userID := ctx.Param("id")
-
+	fmt.Println(userID)
 	id, err := strconv.Atoi(userID)
 	if err != nil {
 
@@ -96,6 +98,7 @@ func (u *UserUseCaseImpl) GetUser(ctx *gin.Context) {
 
 	ctx.JSON(200, user)
 }
+
 func (u *UserUseCaseImpl) UpdateUser(ctx *gin.Context) {
 	userID := ctx.Param("id")
 

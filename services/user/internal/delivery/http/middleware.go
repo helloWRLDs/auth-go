@@ -2,7 +2,7 @@ package httpDelivery
 
 import (
 	"net/http"
-	"time"
+	"os"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -32,22 +32,6 @@ func EncodedContentMiddleware() gin.HandlerFunc {
 	}
 }
 
-var secretKey = "your_secret_key_here"
-
-type UserClaims struct {
-	ID        int       `json:"id"`
-	Email     string    `json:"email"`
-	Password  []byte    `json:"password"`
-	CreatedAt time.Time `json:"created_at"`
-	jwt.StandardClaims
-}
-
-func getSecretKey() string {
-	return secretKey
-}
-
-
-
 func AuthMiddleware(ctx *gin.Context) {
 	tokenString := ctx.Request.Header.Get("Authorization")
 	if tokenString == "" {
@@ -56,7 +40,7 @@ func AuthMiddleware(ctx *gin.Context) {
 		return
 	}
 	token, err := jwt.ParseWithClaims(tokenString, &UserClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(getSecretKey()), nil
+		return []byte(os.Getenv("secret_key")), nil
 	})
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Authorization Failed (invalid token)"})
