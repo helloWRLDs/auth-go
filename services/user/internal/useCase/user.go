@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"strconv"
 )
 
 type UserUseCaseImpl struct {
@@ -65,4 +66,24 @@ func (u *UserUseCaseImpl) LoginUser(ctx *gin.Context) {
 		ctx.JSON(401, fmt.Sprintf("email=%s not found", email))
 	}
 
+}
+func (u *UserUseCaseImpl) GetUser(ctx *gin.Context) {
+	userID := ctx.Param("id")
+
+	id, err := strconv.Atoi(userID)
+	if err != nil {
+
+		ctx.JSON(400, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	// Retrieve user from the repository
+	user, err := u.repo.Get(id)
+	if err != nil {
+		// Handle error
+		ctx.JSON(404, gin.H{"error": "User not found"})
+		return
+	}
+
+	ctx.JSON(200, user)
 }
