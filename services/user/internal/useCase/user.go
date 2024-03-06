@@ -5,7 +5,6 @@ import (
 	"auth-go/services/user/internal/repository"
 	"database/sql"
 	"fmt"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -45,4 +44,25 @@ func (u *UserUseCaseImpl) RegisterUser(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(200, fmt.Sprintf("user registered with id=%d", id))
+}
+func (u *UserUseCaseImpl) LoginUser(ctx *gin.Context) {
+	var userRepository repository.UserRepositoryImpl
+	if err := ctx.Request.ParseForm(); err != nil {
+		ctx.JSON(422, err.Error())
+
+	}
+
+	email := ctx.PostForm("email")
+	password := ctx.PostForm("password")
+	if u.repo.ExistsByEmail(email) {
+		userID, err := userRepository.Authenticate(email, password)
+		if err != nil {
+			ctx.JSON(401, fmt.Sprintf("Not authorized"))
+			return
+		}
+		ctx.JSON(200, gin.H{"message": "Login successful", "userID": userID})
+	} else {
+		ctx.JSON(401, fmt.Sprintf("email=%s not found", email))
+	}
+
 }
