@@ -87,3 +87,49 @@ func (u *UserUseCaseImpl) GetUser(ctx *gin.Context) {
 
 	ctx.JSON(200, user)
 }
+func (u *UserUseCaseImpl) UpdateUser(ctx *gin.Context) {
+	userID := ctx.Param("id")
+
+	id, err := strconv.Atoi(userID)
+	if err != nil {
+		// Handle error if the user ID is not a valid integer
+		ctx.JSON(400, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	// Retrieve user data from the request body
+	var userData domain.User
+	if err := ctx.ShouldBindJSON(&userData); err != nil {
+		ctx.JSON(400, gin.H{"error": "Invalid request payload"})
+		return
+	}
+
+	// Update user
+	if err := u.repo.Update(id, userData); err != nil {
+		// Handle error (e.g., user not found)
+		ctx.JSON(404, gin.H{"error": "User not found"})
+		return
+	}
+
+	ctx.JSON(200, gin.H{"message": "User updated successfully"})
+}
+
+func (u *UserUseCaseImpl) RemoveUser(ctx *gin.Context) {
+
+	userID := ctx.Param("id")
+
+	id, err := strconv.Atoi(userID)
+	if err != nil {
+		ctx.JSON(400, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	// Delete user from the repository
+	if err := u.repo.Delete(id); err != nil {
+		// Handle error
+		ctx.JSON(500, gin.H{"error": "Failed to delete user"})
+		return
+	}
+
+	ctx.JSON(200, gin.H{"message": "User deleted successfully"})
+}
