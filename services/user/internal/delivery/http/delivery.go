@@ -1,6 +1,7 @@
 package httpDelivery
 
 import (
+	"auth-go/services/user/configs"
 	usecase "auth-go/services/user/internal/useCase"
 	"database/sql"
 
@@ -8,14 +9,16 @@ import (
 )
 
 type HttpDelivery struct {
-	Router *gin.Engine
-	UserUC usecase.UserUseCase
+	Router    *gin.Engine
+	UserUC    usecase.UserUseCase
+	AppConfig *configs.AppConfig
 }
 
-func NewRouter(db *sql.DB) *HttpDelivery {
+func NewRouter(db *sql.DB, cfg *configs.AppConfig) *HttpDelivery {
 	return &HttpDelivery{
-		Router: gin.Default(),
-		UserUC: usecase.NewUserUseCase(db),
+		Router:    gin.Default(),
+		UserUC:    usecase.NewUserUseCase(db),
+		AppConfig: cfg,
 	}
 }
 

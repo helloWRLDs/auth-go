@@ -5,6 +5,7 @@ import (
 	"auth-go/services/user/internal/repository"
 	"database/sql"
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -45,24 +46,32 @@ func (u *UserUseCaseImpl) RegisterUser(ctx *gin.Context) {
 	}
 	ctx.JSON(200, fmt.Sprintf("user registered with id=%d", id))
 }
+
 func (u *UserUseCaseImpl) LoginUser(ctx *gin.Context) {
-	var userRepository repository.UserRepositoryImpl
+	// receiving data from post request
 	if err := ctx.Request.ParseForm(); err != nil {
 		ctx.JSON(422, err.Error())
-
+		return
 	}
-
 	email := ctx.PostForm("email")
 	password := ctx.PostForm("password")
-	if u.repo.ExistsByEmail(email) {
-		userID, err := userRepository.Authenticate(email, password)
-		if err != nil {
-			ctx.JSON(401, fmt.Sprintf("Not authorized"))
-			return
-		}
-		ctx.JSON(200, gin.H{"message": "Login successful", "userID": userID})
-	} else {
-		ctx.JSON(401, fmt.Sprintf("email=%s not found", email))
+	// authenticating email
+	if !u.repo.ExistsByEmail(email) {
+		ctx.JSON(401, fmt.Sprintf("Not authorized: email=%s not found", email))
+		return
+	}
+	// authenticating password
+	userID, err := u.repo.Authenticate(email, []byte(password))
+	if err != nil {
+		ctx.JSON(401, fmt.Sprintf("Not authorized: %s", err.Error()))
+		return
+	}
+	// signing token
+	token, err := generateToken(userID, email)
+	if err != nil {
+		ctx.JSON(401, fmt.Sprintf("Not authorized: %s", err.Error()))
+		return
 	}
 
+	ctx.JSON(200, gin.H{"token": token})
 }

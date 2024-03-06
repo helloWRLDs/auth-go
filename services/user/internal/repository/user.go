@@ -3,6 +3,8 @@ package repository
 import (
 	"auth-go/services/user/internal/domain"
 	"database/sql"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserRepositoryImpl struct {
@@ -60,14 +62,16 @@ func (r *UserRepositoryImpl) Delete(id int) error {
 	return nil
 }
 
-func (r *UserRepositoryImpl) Authenticate(email, password string) (int, error) {
+func (r *UserRepositoryImpl) Authenticate(email string, password []byte) (int, error) {
 	var id int
 	var hashedPassword []byte
-	stmt := "SELECT email, password FROM users WHERE email=?"
+	stmt := "SELECT id, password FROM users WHERE email=?"
 	if err := r.DB.QueryRow(stmt, email).Scan(&id, &hashedPassword); err != nil {
-		return -1, err
+		return -1, ErrEmailNotFound
 	}
-
+	if err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(password)); err != nil {
+		return -1, ErrIncorrectPassword
+	}
 	return id, nil
 }
 

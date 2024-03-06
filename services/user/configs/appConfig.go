@@ -8,8 +8,9 @@ import (
 )
 
 type AppConfig struct {
-	Addr string
-	Db   *mysql.MySqlConfig
+	Addr      string
+	SecretKey string
+	Db        *mysql.MySqlConfig
 }
 
 func LoadAppConfig() *AppConfig {
@@ -17,7 +18,8 @@ func LoadAppConfig() *AppConfig {
 		return nil
 	}
 	return &AppConfig{
-		Addr: os.Getenv("addr"),
+		Addr:      os.Getenv("addr"),
+		SecretKey: os.Getenv("secret_key"),
 		Db: &mysql.MySqlConfig{
 			User:     os.Getenv("db_user"),
 			Password: os.Getenv("db_password"),

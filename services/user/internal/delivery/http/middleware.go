@@ -1,10 +1,11 @@
 package httpDelivery
 
 import (
-	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
 func JsonContentMiddleware() gin.HandlerFunc {
@@ -45,25 +46,7 @@ func getSecretKey() string {
 	return secretKey
 }
 
-func generateToken(user UserClaims) (string, error) {
-	expirationTime := time.Now().Add(24 * time.Hour)
 
-	userClaims := &UserClaims{
-		ID:        user.ID,
-		Email:     user.Email,
-		Password:  user.Password,
-		CreatedAt: user.CreatedAt,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-		},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, userClaims)
-	signedToken, err := token.SignedString([]byte(getSecretKey()))
-	if err != nil {
-		return "", err
-	}
-	return signedToken, nil
-}
 
 func AuthMiddleware(ctx *gin.Context) {
 	tokenString := ctx.Request.Header.Get("Authorization")

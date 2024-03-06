@@ -16,7 +16,7 @@ func main() {
 		os.Exit(1)
 	}
 	defer db.Close()
-	delivery := httpDelivery.NewRouter(db)
+	delivery := httpDelivery.NewRouter(db, cfg)
 	delivery.InitRoutes()
 
 	srv := &http.Server{
